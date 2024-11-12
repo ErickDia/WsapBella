@@ -1,0 +1,82 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="WhatSend PRO | login">
+    <main class="h-screen flex justify-center items-center bg-login">
+        <div class="flex flex-col p-12 main-bg-color text-white">
+            <p class=" self-center text-4xl mb-10">WhatSend Pro</p>
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre">
+
+            <label for="contra">Contraseña:</label>
+            <input type="password" id="contra">
+
+            <button id="btn-login" class=" bg-gray-200 text-black p-1 mt-4">Ingresar</button>
+        </div>
+    </main>
+
+    
+</Layout>
+
+<style>
+    
+    .bg-login {
+        background: rgb(2,0,36);
+        background: linear-gradient(-135deg, #213022 0%, #121a12 50%, #0c110c 100%);
+    }
+    .main-bg-color {
+        background-color: var(--main-color);
+    }
+    label {
+        margin-bottom: 0.5rem;
+    }
+    input {
+        padding: 5px 10px;
+        /* height: 10px; */
+        color: #1b271c;
+        margin-bottom: 0.75rem;
+    }
+</style>
+<script is:inline>
+
+    const auntentication = async () => {
+        if (localStorage.getItem("key-server")) {
+            const response = await fetch("http://localhost:5000/api/v1/usuario/getUserToken", {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("key-server")}`
+                }
+            });
+            const respjson = await response.json();
+            console.log(respjson);
+            if (respjson.status === "success") {
+                window.location.href = '/';
+            }
+
+        }
+    }
+
+    auntentication();
+
+
+    const btn_login = document.querySelector("#btn-login");
+    btn_login.addEventListener("click", async () => {
+
+        const usu_nombre = document.getElementById("nombre").value;
+        const usu_password = document.getElementById("contra").value;
+
+
+        const response = await fetch("http://localhost:5000/api/v1/usuario/login", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({usu_nombre, usu_password})
+        });
+        const respjson = await response.json();
+        console.log(respjson);
+        if (respjson.status === "success") {
+            localStorage.setItem("key-server", respjson.data.token);
+        }
+    })
+</script>
